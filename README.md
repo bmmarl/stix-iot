@@ -1,1 +1,1 @@
-# iot_schemas
+# STIX IoT
