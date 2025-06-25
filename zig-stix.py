@@ -5,14 +5,14 @@ import uuid
 from uuid import uuid5
 
 SCO_DET_ID_NAMESPACE = uuid.UUID('00abedb4-aa42-466c-9c01-fed23315a9b7')
-def gen_uuid(string):
-    return f'{string}--{uuid.uuid5(SCO_DET_ID_NAMESPACE,string)}'
+def gen_uuid(string,name):
+    return f'{string}--{uuid.uuid5(SCO_DET_ID_NAMESPACE,name)}'
 
 #TODO Create Extensions for IOT Traffic and Devices
 
 iot_device_def = ExtensionDefinition(
-        id=gen_uuid("extension-definition"),
-        created_by_ref=gen_uuid("identity"),
+        id=gen_uuid("extension-definition","iot_device_def"),
+        created_by_ref=gen_uuid("identity", "id"),
         name="iot-infrastrucutre",
         description="This extension creates a new SDO that can be used to represent IoT devices, sensors, hubs, etc.",
         schema="https://raw.githubusercontent.com/bmmarl/stix-iot/refs/heads/main/STIG/src/static/jsedit/iot-infrastructure.json",
@@ -22,34 +22,39 @@ iot_device_def = ExtensionDefinition(
         ])
 
 iot_traffic_def = ExtensionDefinition(
-        id=gen_uuid("extension-definition"),
-        created_by_ref=gen_uuid("identity"),
+        id=gen_uuid("extension-definition", "iot_traffic_def"),
+        created_by_ref=gen_uuid("identity", "id"),
         name="iot-traffic",
         description="This extension creates a new SCO that can be used to represent traffic between IoT Devices, specifically under the IEEE 803.15.4 standard and ZigBee protcol.",
-        schema="",
+        schema="https://raw.githubusercontent.com/bmmarl/stix-iot/refs/heads/main/STIG/src/static/jsedit/observables/iot-traffic.json",
         version="1.0",
         extension_types=[
             "new-sco"
         ])
 
+ext_id_map = {}
+ext_id_map[iot_device_def.name] = iot_device_def.id
+ext_id_map[iot_traffic_def.name] = iot_traffic_def.id
 
 
-#print(iot_device_def.serialize(pretty=True))
+print(iot_traffic_def.serialize(pretty=True))
+print(iot_device_def.serialize(pretty=True))
 
+iot_infra_functions = ["Coordinator", "Router", "End Device"]
 #Extension Class for IOT Devices
 @stix2.v21.CustomObject(
-        'iot-device', [
+        'iot-infrastrucutre', [
             ('name', stix2.properties.StringProperty(required=True)),
-            ('zigbee_network_address', stix2.properties.StringProperty(required=True)),
-            ('ieee_802_15_4_mac_address', stix2.properties.StringProperty(required=True)),
-            ], extension_name=ext_id_map["IOT Device"], is_sdo=True,
+            ('description', stix2.properties.StringProperty(required=False)),
+            ('infrastructure_function', stix2.properties.EnumProperty(allowed=iot_infra_functions, required=True)),
+            ], extension_name=ext_id_map["iot-infrastrucutre"], is_sdo=True,
         )
 class IOT_Device:
     pass
 
 #Extension Class for IOT Traffic
 @stix2.v21.CustomObject(
-        'zigbee_traffic', [
+        'zigbee-traffic', [
             ('name', stix2.properties.StringProperty(required=True)),
             ('protocol', stix2.properties.StringProperty(required=True)),
             ('mac_src', stix2.properties.StringProperty(required=False)),
@@ -87,14 +92,13 @@ class IOT_Device:
             ('command_options', stix2.properties.StringProperty(required=False)),
             ('route_id', stix2.properties.StringProperty(required=False)),
             ('info', stix2.properties.StringProperty(required=True)),
-        ], extension_name=ext_id_map["IEEE 802.15.4 Traffic"], is_sdo=False,
+        ], extension_name=ext_id_map["iot-traffic"], is_sdo=False,
     )
 class Zigbee_Traffic:
     pass
 
-
-
-
+#dev = Zigbee_Traffic(name="test", protocol="test2", utc_date="test3", length="1", info="test4")
+#print(dev.serialize(pretty=True))
 
 
 
