@@ -1,8 +1,8 @@
 {
-  "$id": "http://raw.githubusercontent.com/oasis-open/cti-stix2-json-schemas/stix2.1/schemas/sdos/infrastructure.json",
+  "$id": "https://raw.githubusercontent.com/bmmarl/stix-iot/refs/heads/main/STIG/src/static/jsedit/iot-infrastructure.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "infrastructure",
-  "description": "Infrastructure objects describe systems, software services, and associated physical or virtual resources.",
+  "title": "iot-infrastructure",
+  "description": "IoT Infrastructure objects describe physical IoT devices, sensors, hubs, etc.",
   "type": "object",
   "allOf": [
     {
@@ -12,30 +12,30 @@
       "properties": {
         "type": {
           "type": "string",
-          "description": "The type of this object, which MUST be the literal `infrastructure`.",
+          "description": "The type of this object, which MUST be the literal `iot-infrastructure`.",
           "enum": [
             "infrastructure"
           ]
         },
         "id": {
           "title": "id",
-          "pattern": "^infrastructure--"
+          "pattern": "^iot-infrastructure--"
         },
         "name": {
           "type": "string",
-          "description": "The name used to identify the Infrastructure."
+          "description": "The name used to identify the IoT Infrastructure."
         },
         "description": {
           "type": "string",
-          "description": "A description that provides more details and context about this Infrastructure potentially including its purpose and its key characteristics."
+          "description": "A description that provides more details and context about this IoT Infrastructure potentially including its purpose and its key characteristics."
         },
-        "infrastructure_types": {
+        "infrastructure_function": {
           "type": "array",
-          "description": "This field is an Open Vocabulary that specifies the type of infrastructure. Open vocab - infrastructure-type-ov",
+          "description": "This field is an Open Vocabulary that specifies the function of the IoT Infrastructure component. Open vocab - iot-infrastructure-type-ov",
           "items": {
-            "type": "string",
+            "type": "string", 
             "$ref": "#/definitions/infrastructure-type-ov"
-
+            
           },
           "minItems": 1
         },
@@ -72,20 +72,12 @@
     "name"
   ],
   "definitions": {
-    "infrastructure-type-ov": {
+    "iot-infrastructure-type-ov": {
       "type": "string",
       "enum": [
-        "amplification",
-        "anonymization",
-        "botnet",
-        "command-and-control",
-        "exfiltration",
-        "hosting-malware",
-        "hosting-target-lists",
-        "phishing",
-        "reconnaissance",
-        "staging",
-        "unknown"
+        "Coordinator",
+        "Router",
+        "End Device"
       ]
     }
   }
