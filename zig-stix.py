@@ -8,7 +8,8 @@ SCO_DET_ID_NAMESPACE = uuid.UUID('00abedb4-aa42-466c-9c01-fed23315a9b7')
 def gen_uuid(string,name):
     return f'{string}--{uuid.uuid5(SCO_DET_ID_NAMESPACE,name)}'
 
-#TODO Create Extensions for IOT Traffic and Devices
+
+ext_defs = list()
 
 iot_device_def = ExtensionDefinition(
         id=gen_uuid("extension-definition","iot_device_def"),
@@ -20,6 +21,7 @@ iot_device_def = ExtensionDefinition(
         extension_types=[
     	    "new-sdo"
         ])
+ext_defs.append(iot_device_def)
 
 iot_traffic_def = ExtensionDefinition(
         id=gen_uuid("extension-definition", "iot_traffic_def"),
@@ -31,14 +33,29 @@ iot_traffic_def = ExtensionDefinition(
         extension_types=[
             "new-sco"
         ])
+ext_defs.append(iot_traffic_def)
 
+zbee_nwk_addr_def = ExtensionDefinition(
+        id=gen_uuid("extension-definition", "zbee_nwk_addr_def"),
+        created_by_ref=gen_uuid("identity", "id"),
+        name="zbee-nwk-addr",
+        description="This extension creates a new SCO that can be used to represent 16 Bit network Zigbee Addresses for IoT Devices",
+        schema="https://raw.githubusercontent.com/bmmarl/stix-iot/refs/heads/main/STIG/src/static/jsedit/observables/zbee-nwk-addr.json",
+        version="1.0",
+        extension_types=[
+            "new-sco"
+        ])
+ext_defs.append(zbee_nwk_addr_def)
+
+
+
+#Generate map from names -> ids
 ext_id_map = {}
-ext_id_map[iot_device_def.name] = iot_device_def.id
-ext_id_map[iot_traffic_def.name] = iot_traffic_def.id
+for df in ext_defs:
+    ext_id_map[df.name] = df.id
 
-
-print(iot_traffic_def.serialize(pretty=True))
-print(iot_device_def.serialize(pretty=True))
+for df in ext_defs:
+    print(df.serialize(pretty=True))
 
 iot_infra_functions = ["Coordinator", "Router", "End Device"]
 #Extension Class for IOT Devices
@@ -51,6 +68,17 @@ iot_infra_functions = ["Coordinator", "Router", "End Device"]
         )
 class IOT_Device:
     pass
+
+@stix2.v21.CustomObject(
+        'zbee-nwk-addr', [
+            ('name', stix2.properties.StringProperty(required=True)),
+            ('value', stix2.properties.StringProperty(required=True)),
+            ('resolves_to_refs', stix2.properties.ListProperty(stix2.properties.StringProperty, required=False)),
+            ], extension_name=ext_id_map["zbee-nwk-addr"], is_sdo=True,
+        )
+class ZBee_NWK_Addr:
+    pass
+
 
 #Extension Class for IOT Traffic
 @stix2.v21.CustomObject(
@@ -96,6 +124,7 @@ class IOT_Device:
     )
 class Zigbee_Traffic:
     pass
+
 
 #dev = Zigbee_Traffic(name="test", protocol="test2", utc_date="test3", length="1", info="test4")
 #print(dev.serialize(pretty=True))

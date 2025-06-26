@@ -14,7 +14,7 @@
           "type": "string",
           "description": "The type of this object, which MUST be the literal `iot-infrastructure`.",
           "enum": [
-            "infrastructure"
+            "iot-infrastructure"
           ]
         },
         "id": {

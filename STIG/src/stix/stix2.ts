@@ -837,6 +837,23 @@ export type Ipv6Addr = (CyberObservableCore & {
   [k: string]: any;
 });
 
+export type ZbeeNwkAddr = (CyberObservableCore & {
+  /**
+ * The value of this property MUST be `ipv6-addr`.
+ */
+  type?: 'zbee-nwk-addr';
+  /**
+ * Specifies one or more IPv6 addresses expressed using CIDR notation.
+ */
+  value: string;
+  /**
+ * Specifies a list of references to one or more Layer 2 Media Access Control (MAC) addresses that the IPv6 address resolves to.
+ */
+  resolves_to_refs?: string[];
+ 
+  [k: string]: any;
+});
+
 export interface MarkingDefinition {
   type: 'marking definition';
   id: Identifier;

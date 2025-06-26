@@ -1,24 +1,24 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "network-traffic",
-  "description": "The Network Traffic Object represents arbitrary network traffic that originates from a source and is addressed to a destination.",
+  "title": "iot-traffic",
+  "description": "The IoT Traffic Object represents arbitrary ZigBee and IEEE 802.15.4 traffic within an IoT network that originates from a source and is addressed to a destination.",
   "type": "object",
   "$ref": "static/jsedit/common/cyber-observable-core.json",
   "properties": {
     "type": {
       "type": "string",
-      "description": "The value of this property MUST be `network-traffic`.",
-      "default": "network-traffic",
+      "description": "The value of this property MUST be `iot-traffic`.",
+      "default": "iot-traffic",
       "readonly": "true"
     },
     "id": {
       "title": "id",
-      "pattern": "^network-traffic--",
+      "pattern": "^iot-traffic--",
       "readonly": "true"
     },
     "extensions": {
-      "$ref": "#/definitions/network-traffic-extensions-dictionary",
-      "description": "The Network Traffic Object defines the following extensions. In addition to these, producers MAY create their own. Extensions: http-request-ext, tcp-ext, icmp-ext, socket-ext"
+      "$ref": "#/definitions/iot-traffic-extensions-dictionary",
+      "description": "The IoT Traffic Object defines the following extensions. In addition to these, producers MAY create their own. Extensions: ieee-802-15-4-ext, zigbee-nwk-ext, zigbee-sec-ext, zigbee-aps-ext, zigbee-zcl-ext, zigbee-zdp-ext"
     },
     "start": {
       "$ref": "static/jsedit/common/timestamp.json",
@@ -28,14 +28,6 @@
       "$ref": "static/jsedit/common/timestamp.json",
       "description": "Specifies the date/time the network traffic ended, if known."
     },
-    "is_active": {
-      "type": "boolean",
-      "enum": [
-        false,
-        true
-      ],
-      "description": "Indicates whether the network traffic is still ongoing."
-    },
     "src_ref": {
       "description": "Specifies the source of the network traffic, as a reference to an Observable Object.",
       "type": "string"
@@ -44,77 +36,17 @@
       "description": "Specifies the destination of the network traffic, as a reference to an Observable Object.",
       "type": "string"
     },
-    "src_port": {
-      "type": "integer",
-      "description": "Specifies the source port used in the network traffic, as an integer. The port value MUST be in the range of 0 - 65535.",
-      "minimum": 0,
-      "maximum": 65535
-    },
-    "dst_port": {
-      "type": "integer",
-      "description": "Specifies the destination port used in the network traffic, as an integer. The port value MUST be in the range of 0 - 65535.",
-      "minimum": 0,
-      "maximum": 65535
-    },
     "protocols": {
       "type": "array",
-      "description": "Specifies the protocols observed in the network traffic, along with their corresponding state.",
+      "description": "Specifies the protocols observed in the ZigBee Traffic.",
       "items": {
         "type": "string"
       },
       "minItems": 1
     },
-    "src_byte_count": {
-      "type": "integer",
-      "description": "Specifies the number of bytes sent from the source to the destination."
-    },
-    "dst_byte_count": {
-      "type": "integer",
-      "description": "Specifies the number of bytes sent from the destination to the source."
-    },
-    "src_packets": {
-      "type": "integer",
-      "description": "Specifies the number of packets sent from the source to the destination."
-    },
-    "dst_packets": {
-      "type": "integer",
-      "description": "Specifies the number of packets sent destination to the source."
-    },
-    "ipfix": {
-      "description": "Specifies any IP Flow Information Export (IPFIX) data for the traffic.",
-      "allOf": [{ "$ref": "static/jsedit/common/dictionary.json" }],
-      "patternProperties": {
-        "^[a-zA-Z0-9_-]{0,250}$": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "integer"
-            }
-          ]
-        }
-      }
-    },
-    "src_payload_ref": {
-      "description": "Specifies the bytes sent from the source to the destination.",
-      "type": "string"
-    },
-    "dst_payload_ref": {
-      "description": "Specifies the bytes sent from the source to the destination.",
-      "type": "string"
-    },
-    "encapsulates_refs": {
-      "type": "array",
-      "description": "Links to other network-traffic objects encapsulated by a network-traffic.",
-      "items": {
-        "type": "string"
-      },
-      "minItems": 1
-    },
-    "encapsulated_by_ref": {
-      "description": "Links to another network-traffic object which encapsulates this object.",
-      "type": "string"
+    "length": {
+      "type": "string",
+      "description": "Specifies the Length of the frame."      
     }
   },
   "required": [
@@ -123,172 +55,334 @@
     "protocols"
   ],
   "definitions": {
-    "network-traffic-extensions-dictionary": {
+    "iot-traffic-extensions-dictionary": {
       "allOf": [{ "$ref": "static/jsedit/common/dictionary.json" }],
       "patternProperties": {
-        "^http-request-ext$": {
+        "^ieee-802-15-4-ext$": {
           "type": "object",
-          "description": "The HTTP request extension specifies a default extension for capturing network traffic properties specific to HTTP requests.",
+          "description": "The IEEE 802.15.4 extension defines an extension for capturing values within fields specified by IEEE 802.15.4",
           "allOf": [
               {
                   "properties": {
-                    "request_method": {
+                    "mac-src": {
                       "type" : "string",
-                      "description": "Specifies the HTTP method portion of the HTTP request line, as a lowercase string."
+                      "description": "Specifies the MAC source address of the frame."
                     },
-                    "request_value": {
+                    "mac-dst": {
                       "type": "string",
-                      "description": "Specifies the value (typically a resource path) portion of the HTTP request line."
+                      "description": "Specifies the MAC destination address of the frame."
                     },
-                    "request_version": {
+                    "dst-pan": {
                       "type": "string",
-                      "description": "Specifies the HTTP version portion of the HTTP request line, as a lowercase string."
+                      "description": "Specifies the Personal Area Network destination address of the frame."
                     },
-                    "request_header": {
-                      "allOf": [{ "$ref": "static/jsedit/common/dictionary.json" }],
-                      "description": "Specifies all of the HTTP header fields that may be found in the HTTP client request, as a dictionary.",
-                      "patternProperties": {
-                        "^.+$": {
-                          "type": "string"
-                        }
-                      },
-                      "additionalProperties": false
+                    "mac-sn": {
+                      "type": "string",
+                      "description": "Specifies the MAC Sequence Number of the frame."
                     },
-                    "message_body_length": {
-                      "type": "integer",
-                      "description": "Specifies the length of the HTTP message body, if included, in bytes."
+                    "src-64": {
+                      "type": "string",
+                      "description": "64-Bit MAC address assigned by manufacturer."
                     },
-                    "message_body_data_ref": {
-                      "description": "Specifies the data contained in the HTTP message body, if included.",
+                    "fcs": {
+                      "description": "Specifies the frame sequence Frame Check Sequence of the frame.",
+                      "type": "string"
+                    },
+                    "frame-type": {
+                     "description": "Signifies the type of frame.",
+                     "type": "string"
+                    },
+                    "security-enabled": {
+                      "description": "Indicates whether the security features are enabled.",
+                      "type": "string"
+                    },
+                    "frame-pending": {
+                      "description": "Indicates if more frames are pending for the recipient.",
+                      "type": "string"
+                    },
+                    "acknowledgement-request": {
+                      "description": "Indicates frame is requesting an acknowledgement for the frame.",
+                      "type": "string"
+                    },
+                    "pan-id-compression": {
+                      "description": "Indicates if the PAN ID is compressed in the adressing fields.",
+                      "type": "string"
+                    },
+                    "sequence-number-compression": {
+                      "description": "Indicates if the PAN ID is compressed in the adressing fields.",
+                      "type": "string"
+                    },
+                    "information-elements-present": {
+                      "description": "Indicates if Informatin Elements are present in the frame.",
+                      "type": "string"
+                    },
+                    "sequence-number": {
+                      "description": "Specifies the Sequence Number of the frame.",
+                      "type": "string"
+                    },
+                    "source-addressing-mode": {
+                      "description": "Specifies the Addressing Mode the source utilizes (16 or 64 bit).",
+                      "type": "string"
+                    },
+                    "dst-addressing-mode": {
+                      "description": "Specifies the Addressing Mode the destination utilizes (16 or 64 bit).",
+                      "type": "string"
+                    },
+                    "frame-control-field": {
+                      "description": "Specifies the frame control field in the WPAN section.",
+                      "type": "string"
+                    },
+                    "origin": {
+                      "description": "Specifies the WPAN Origin.",
+                      "type": "string"
+                    },
+                    "command-id": {
+                      "description": "Specifies the WPAN Commadn ID.",
+                      "type": "string"
+                    },
+                    "frame-version": {
+                      "description": "Specifies the version of IEEE 802.15.4 the frame uses.",
+                      "type": "string"
+                    }
+                 }
+              }
+          ]
+        },
+        "^zigbee-nwk-ext$": {
+          "type": "object",
+          "description": "The ZigBee extension defines an extension for capturing traffic properties associated with ZigBee Network Traffic. ",
+          "allOf": [
+              {
+                  "properties": {
+                    "zbee-nwk-src": {
+                      "description": "Specifies the 16-bit ZigBee Network Source address of the frame.",
+                      "type": "string"
+                    },
+                    "zbee-nwk-dst": {
+                      "description": "Specifies the 16-bit ZigBee Network Destination address of the frame.",
+                      "type": "string"
+                    },
+                    "nwk-frame-control-field": {
+                      "description": "Specifies the 16-bit value in Frame Control Field.",
+                      "type": "string"
+                    },
+                    "radius": {
+                      "description": "Specifies a 1-byte value that is used as an indication of how far-reaching a signal is intended to go.",
+                      "type": "string"
+                    },
+                    "origin": {
+                      "description": "Specifies the origin value of the traffic.",
+                      "type": "string"
+                    },
+                    "command-id": {
+                      "description": "Indicates the Command the traffic is issuing.",
+                      "type": "string"
+                    },
+                    "command-options": {
+                      "description": "Specifies which options are enabled for the command.",
+                      "type": "string"
+                    },
+                    "route-id": {
+                      "description": "Identifies the route the traffic is taking.",
+                      "type": "string"
+                    },
+                    "path-cost": {
+                      "description": "Indicates the Path Cost Value of the Frame",
+                      "type": "string"
+                    },
+                    "rejoin": {
+                      "description": "Indicates if this traffic is a Rejoin request ",
+                      "type": "string"
+                    },
+                    "leave": {
+                      "description": "Indicates if this traffic is a Leave request ",
+                      "type": "string"
+                    },
+                    "remove-children": {
+                      "description": "Indicates if this traffic is request to remove its children nodes.",
+                      "type": "string"
+                    },
+                    "requested-timeout-enumeration": {
+                      "description": "Indicates the alloted amount of time before the end device times out",
+                      "type": "string"
+                    },
+                    "nwk-desintion": {
+                      "description": "Indicates the network desintion for routing information.",
+                      "type": "string"
+                    },
+                    "nwk-extended-src": {
+                      "description": "Specifies the 64-bit MAC address of the source device.",
+                      "type": "string"
+                    },
+                    "nwk-sequence-number": {
+                      "description": "Specifies the dequence number of the Zigbee Network traffic.",
+                      "type": "string"
+                    },
+                    "end-device-config":{
+                      "description": "Specifies the end device configuration",
                       "type": "string"
                     }
                   }
-              },
-              {
-                  "anyOf":[
-                      { "required": ["request_method"] },
-                      { "required": ["request_value"] }
-                  ]
-              }
+            }
           ]
         },
-        "^icmp-ext$": {
+        "^zigbee-aps-ext$": {
           "type": "object",
-          "description": "The ICMP extension specifies a default extension for capturing network traffic properties specific to ICMP.",
+          "description": "The ZigBee Application Support (APS) Sub-layer extension provoides an extension capturing traffic properties associated with ZigBee APS.",
           "allOf": [
               {
                   "properties": {
-                    "icmp_type_hex": {
-                      "title": "icmp_type_hex",
-                      "$ref": "static/jsedit/common/hex.json",
-                      "description": "Specifies the ICMP type byte."
+                    "key": {
+                      "description": "Specifies the encryption key value that is being transferred to an end device.",
+                      "type": "string"
                     },
-                    "icmp_code_hex": {
-                      "title": "icmp_code_hex",
-                      "$ref": "static/jsedit/common/hex.json",
-                      "description": "Specifies the ICMP code byte."
+                    "key-type": {
+                      "description": "Specifies type of encryption key that is being delivered.",
+                      "type": "string"
+                    },
+                    "profile": {
+                      "description": "Specifies the Profile that the traffic is using.",
+                      "type": "string"
+                    },
+                    "cluster": {
+                      "description": "Specifies the Cluster that the traffic is using.",
+                      "type": "string"
+                    },
+                    "destination-endpoint": {
+                      "description": "Specifies the desintaion endpoint value.",
+                      "type": "string"
+                    },
+                    "counter-value": {
+                      "description": "Specifies the counter value.",
+                      "type": "string"
+                    },
+                    "dst-endpoint": {
+                      "description": "Specifies the destintion endpoint value.",
+                      "type": "string"
+                    },
+                    "src-endpoint": {
+                      "description": "Specifies the source endpoint value.",
+                      "type": "string"
+                    },
+                    "device-address": {
+                      "description": "Specifies the APS device address.",
+                      "type": "string"
+                    },
+                    "counter": {
+                      "description": "Specifies the APS counter value.",
+                      "type": "string"
+                    },
+                    "sequence-number": {
+                      "description": "Specifies the APS sequence number.",
+                      "type": "string"
+                    },
+                    "extended-source": {
+                      "description": "Specifies the APS 64-bit extended source value.",
+                      "type": "string"
+                    },
+                    "extended-dest": {
+                      "description": "Specifies the APS 64-bit extended desintaion value.",
+                      "type": "string"
                     }
-                  }
-              },
-              {
-                  "anyOf": [
-                      { "required": ["icmp_type_hex"] },
-                      { "required": ["icmp_code_hex"] }
-                  ]
+                }
               }
           ]
         },
-        "^socket-ext$": {
+        "^zigbee-sec-ext$": {
           "type": "object",
-          "description": "The Network Socket extension specifies a default extension for capturing network traffic properties associated with network sockets.",
-          "allOf": [
-              {
-                  "properties": {
-                    "address_family": {
-                      "type": "string",
-                      "description": "Specifies the address family (AF_*) that the socket is configured for.",
-                      "enum": [
-                        "AF_UNSPEC",
-                        "AF_INET",
-                        "AF_IPX",
-                        "AF_APPLETALK",
-                        "AF_NETBIOS",
-                        "AF_INET6",
-                        "AF_IRDA",
-                        "AF_BTH"
-                      ]
-                    },
-                    "is_blocking": {
-                      "type": "boolean",
-                      "description": "Specifies whether the socket is in blocking mode."
-                    },
-                    "is_listening": {
-                      "type": "boolean",
-                      "description": "Specifies whether the socket is in listening mode."
-                    },
-                    "options": {
-                      "title": "options",
-                      "allOf": [{ "$ref": "static/jsedit/common/dictionary.json" }],
-                      "description": "Specifies any options (SO_*) that may be used by the socket, as a dictionary.",
-                      "patternProperties": {
-                        "^(SO|ICMP|ICMP6|IP|IPV6|MCAST|TCP|IRLMP)(_[A-Z]+)+$": {
-                          "type": "integer"
-                        }
-                      },
-                      "additionalProperties": false
-                    },
-                    "socket_type": {
-                      "type": "string",
-                      "description": "Specifies the type of the socket.",
-                      "enum": [
-                        "SOCK_STREAM",
-                        "SOCK_DGRAM",
-                        "SOCK_RAW",
-                        "SOCK_RDM",
-                        "SOCK_SEQPACKET"
-                      ]
-                    },
-                    "socket_descriptor": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "description": "Specifies the socket file descriptor value associated with the socket, as a non-negative integer."
-                    },
-                    "socket_handle": {
-                      "type": "integer",
-                      "description": "Specifies the handle or inode value associated with the socket."
-                    }
-                  }
-              },
-              {
-                  "anyOf": [
-                      { "required": ["address_family"] }
-                  ]
-              }
-          ]
-        },
-        "^tcp-ext$": {
-          "type": "object",
-          "description": "The TCP extension specifies a default extension for capturing network traffic properties specific to TCP.",
+          "description": "The ZigBee Security extension provides an extension for caputring secuirty properties associated with ZigBee traffic.",
           "allOf": [
             {
               "properties": {
-                "src_flags_hex": {
-                  "title": "src_flags_hex",
-                  "$ref": "static/jsedit/common/hex.json",
-                  "description": "Specifies the source TCP flags, as the union of all TCP flags observed between the start of the traffic (as defined by the start property) and the end of the traffic (as defined by the end property). "
+                "security-control-field": {
+                  "description": "Specifies the value of the Security Conrol field in the Security header.",
+                  "type": "string"
                 },
-                "dst_flags_hex": {
-                  "title": "dst_flags_hex",
-                  "$ref": "static/jsedit/common/hex.json",
-                  "description": "Specifies the destination TCP flags, as the union of all TCP flags observed between the start of the traffic (as defined by the start property) and the end of the traffic (as defined by the end property)."
+                "frame-counter": {
+                  "description": "Specifies the value of the counter in the Security header.",
+                  "type": "string"
+                },
+                "message-intergrity-code": {
+                  "description": "Specifies the value of the mic in the Security header.",
+                  "type": "string"
+                },
+                "key": {
+                  "description": "Specifies the value of the ZigBee network key the traffic was encrpyted with.",
+                  "type": "string"
+                },
+                "key-label": {
+                  "description": "Specifies the label of the key.",
+                  "type": "string"
+                },
+                "extended-src": {
+                  "description": "Extended source in the security header.",
+                  "type": "string"
+                },
+                "key-sequence-number": {
+                  "description": "Key sequence number in security header.",
+                  "type": "string"
                 }
               }
-            },
+            }
+          ]
+        },
+        "^zigbee-zcl-ext$": {
+          "type": "object",
+          "description": "The ZigBee Cluster Library extenions provides an extension for cluster properties associted with ZigBee traffic.",
+          "allOf": [
             {
-              "anyOf": [
-                { "required": ["src_flags_hex"] },
-                { "required": ["dst_flags_hex"] }
-              ]
+              "properties": {
+                "manufacturer-code": {
+                  "description": "Specifies the manufacturer code of the device generating trafic.",
+                  "type": "string"
+                },
+                "sequence-num": {
+                  "description": "Specifies sequence number of the ZCL traffic",
+                  "type": "string"
+                },
+                "command": {
+                  "description": "Specifies the command being issued in the traffic",
+                  "type": "string"
+                },
+                "command-response": {
+                  "description": "Specifies the command response being delivered in the traffic",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Specifies the status of the ZCL command issued",
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "^zigbee-zdp-ext$": {
+          "type": "object",
+          "description": "The ZigBee Cluster Library extenions provides an extension for cluster properties associted with ZigBee traffic.",
+          "allOf": [
+            {
+              "properties": {
+                "sequence-num": {
+                  "description": "Specifies ZDP sequence number",
+                  "type": "string"
+                },
+                "extended-address": {
+                  "description": "Specifies 64-bit ZDP address",
+                  "type": "string"
+                },
+                "remove-children": {
+                  "description": "Indicates  ZDP Remove Children Command",
+                  "type": "string"
+                },
+                "rejoin": {
+                  "description": "Indicates ZDP Rejoin Command",
+                  "type": "string"
+                },
+                "network-address-of-intrest": {
+                  "description": "Indicates ZDP Network Address of Intrest",
+                  "type": "string"
+                }
+              }
             }
           ]
         }
@@ -300,3 +394,4 @@
     }
   }
 }
+

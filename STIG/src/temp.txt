@@ -1,0 +1,12 @@
+		    <div class="icon-box" data-tippy-content="IoT Infrastructure">
+                <img name='iot-infrastructure' class="loadlater" src="static/img/FlatIcons/SDOs/iot.jpg" />
+            </div>
+
+
+
+            	<div class="icon-box sco" data-tippy-content="ZigBee Network Address">
+                    <img name='zbee-nkw-addr' class="loadlater" src="static/img/FlatIcons/SCOs/zbee_logo.jpg" />
+               </div>
+	            <div class="icon-box sco" data-tippy-content="IoT Network Traffic">
+                    <img name='iot-traffic' class="loadlater" src="static/img/FlatIcons/SCOs/iot-network-traffic.jpg" />
+               </div>
